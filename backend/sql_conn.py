@@ -9,4 +9,5 @@ def get_sql_connection():
                                     password= 'ApexLegends5293!',
                                     host= '127.0.0.1', # or the host IP address
                                     database= 'grading_system')
+        print("Connection established")
         return __cnx
