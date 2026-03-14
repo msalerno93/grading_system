@@ -1,11 +1,20 @@
-// StudentsPage.tsx (or Students.tsx)
 import { useEffect, useState } from "react";
 import TableComponent from "../../components/TableComponent";
-import { getAllStudentsWithAverages, StudentWithAverage } from "../../server/StudentAPI";
+import PopUpModal from "../../components/PopUpModal";
+import { getAllStudentsWithAverages, StudentWithAverage } from "../../server/students/GetStudentsAPI";
 
 const StudentsPage = () => {
   const [students, setStudents] = useState<StudentWithAverage[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Modal state
+  const [openModal, setOpenModal] = useState(false);
+
+  // Fields for adding a student
+  const studentFields = [
+    { name: "first_name", label: "First Name" },
+    { name: "last_name", label: "Last Name" },
+  ];
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -34,14 +43,28 @@ const StudentsPage = () => {
   }
 
   return (
-    <TableComponent
-      title="Students"
-      buttonLabel="Add Student"
-      onButtonClick={() => console.log("Add Student clicked")}
-      columns={columns}
-      rows={students}
-      onRowClick={(row) => console.log("Clicked student:", row)}
-    />
+    <>
+      <TableComponent
+        title="Students"
+        buttonLabel="Add Student"
+        onButtonClick={() => setOpenModal(true)}   // <-- OPEN MODAL
+        columns={columns}
+        rows={students}
+        onRowClick={(row) => console.log("Clicked student:", row)}
+      />
+
+      {/* Reusable Modal for Adding Students */}
+      <PopUpModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        title="Add Student"
+        fields={studentFields}
+        onSubmit={(data) => {
+          console.log("Student submitted:", data);
+          // TODO: call POST /students API here
+        }}
+      />
+    </>
   );
 };
 
