@@ -39,6 +39,10 @@ def add_teacher():
 def get_students():
     return jsonify(students_dao.get_all_students(connection))
 
+@app.route('/students/with-grades', methods=['GET'])
+def get_students_with_grades():
+    return jsonify(students_dao.get_all_students_with_grades(connection))
+
 @app.route('/students/<int:student_id>', methods=['DELETE'])
 def delete_student(student_id):
     students_dao.delete_student(connection, student_id)

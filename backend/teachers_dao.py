@@ -2,22 +2,54 @@ from sql_conn import get_sql_connection
 
 # GET function to retrieve all teachers from the database
 def get_all_teachers(connection):
+    cursor = connection.cursor(dictionary=True)
 
-    cursor = connection.cursor()
-    #SQL query to select all teachers from the database
-    query = ("SELECT * FROM grading_system.teachers;")
+    query = """
+        SELECT 
+            t.teacher_id,
+            t.first_name,
+            t.last_name,
+            (
+                SELECT sub.subject_name
+                FROM Teacher_Subject ts
+                JOIN Subjects sub ON ts.subject_id = sub.subject_id
+                WHERE ts.teacher_id = t.teacher_id
+                ORDER BY ts.teacher_subject_id ASC
+                LIMIT 1
+            ) AS first_class
+        FROM Teachers t
+        ORDER BY t.teacher_id;
+    """
+
     cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+    cursor = connection.cursor(dictionary=True)
 
-    response = []
+    query = """
+        SELECT 
+            t.teacher_id,
+            t.first_name,
+            t.last_name,
+            sub.subject_name AS first_class
+        FROM Teachers t
+        LEFT JOIN Teacher_Subject ts 
+            ON t.teacher_id = ts.teacher_id
+        LEFT JOIN Subjects sub 
+            ON ts.subject_id = sub.subject_id
+        GROUP BY 
+            t.teacher_id,
+            t.first_name,
+            t.last_name
+        ORDER BY 
+            t.teacher_id;
+    """
 
-    for (teacher_id, first_name, last_name) in cursor:
-        response.append({
-            "teacher_id": teacher_id,
-            "first_name": first_name,
-            "last_name": last_name
-        })
-    print(response)
-    return response
+    cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
 
 #UPDATE function to add a new teacher to the database
 def add_teacher(connection, teacher):

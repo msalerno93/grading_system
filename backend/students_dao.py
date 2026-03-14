@@ -19,6 +19,36 @@ def get_all_students(connection):
     print(response)
     return response
 
+def get_all_students_with_grades(connection):
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        SELECT 
+    s.student_id,
+    s.first_name,
+    s.last_name,
+    ROUND(AVG(g.score), 2) AS average_grade
+FROM Students s
+LEFT JOIN Student_Subject ss 
+    ON s.student_id = ss.student_id
+LEFT JOIN Grades g 
+    ON ss.student_subject_id = g.student_subject_id
+GROUP BY 
+    s.student_id,
+    s.first_name,
+    s.last_name
+ORDER BY 
+    s.last_name,
+    s.first_name;
+    """
+
+    cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+
+
 #UPDATE function to add a new student to the database
 def add_student(connection, student):
     cursor = connection.cursor()
